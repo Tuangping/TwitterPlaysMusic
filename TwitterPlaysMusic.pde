@@ -77,16 +77,19 @@ void loadFile() {
 }
 
 void compare() {
-  if (!finishSearch && playerOrder==0) {
+  if (!finishSearch) {
     for (TableRow row : table.rows()) {
       words = row.getString("words");
       println("comparing");
       if (tweetText.contains(words)==true) {
-        //if (player.isPlaying()||player2.isPlaying()) {
-        //  println("pause music");
-        //  player.pause(); 
-        //  player2.pause();
-        //}
+        if (playerOrder==0 &&player.isPlaying()) {
+          println("pause music");
+          player.pause();
+        }
+        if (playerOrder ==1 &&player.isPlaying()) {
+          println("pause music 2");
+          player2.pause();
+        }
         println(words+" found!");
 
         if (playerOrder ==0) {
@@ -100,9 +103,8 @@ void compare() {
           player2 = minim2.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
           println(words+" start playing 222222");
           player2.play();
-          playerOrder=2;
+          playerOrder=0;
         }
-
         //println("tweetNumber: "+tweetNumber+" / "+ (tweetArray.size()-1)+" ="+tweetText);
         finishSearch = true;
       } else {
