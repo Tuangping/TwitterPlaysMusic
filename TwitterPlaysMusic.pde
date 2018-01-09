@@ -3,7 +3,10 @@ import com.temboo.core.*;
 import com.temboo.Library.Twitter.Search.*;
 
 Minim minim;
+Minim minim2;
 AudioPlayer player;
+AudioPlayer player2;
+int playerOrder =0;
 
 Table table;
 String words;
@@ -41,16 +44,18 @@ void setup() {
   //}
   // minim library needs draw() to play music
   //tweet = "yelling";
+  minim = new Minim(this); 
+  player = minim.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
+  minim2 = new Minim(this); 
+  player2 = minim2.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
 }
 
 void draw() {
   background(#97EBED);
-  fill(200);
+  fill(0);
   text(tweetText, width/2, height/2);
   switch(loadScenes) {
   case 0:
-    minim = new Minim(this); 
-    player = minim.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
     thread("loadFile");
     loadScenes++;
     break;
@@ -72,23 +77,34 @@ void loadFile() {
 }
 
 void compare() {
-  if (!finishSearch) {
+  if (!finishSearch && playerOrder==0) {
     for (TableRow row : table.rows()) {
       words = row.getString("words");
       println("comparing");
-      //if(player.isPlaying()){
-      //println("**hey**");
-      //}
       if (tweetText.contains(words)==true) {
-        println("pause music");
-        player.pause();
-        println("found!");
-        emotion = row.getString("emotion");
-        player = minim.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
-        println("start playing");
-        player.play();
+        //if (player.isPlaying()||player2.isPlaying()) {
+        //  println("pause music");
+        //  player.pause(); 
+        //  player2.pause();
+        //}
+        println(words+" found!");
+
+        if (playerOrder ==0) {
+          emotion = row.getString("emotion");
+          player = minim.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
+          player.play();
+          println(words+" start playing 1111111");
+          playerOrder=1;
+        } else if ( playerOrder==1) {
+          emotion = row.getString("emotion");
+          player2 = minim2.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
+          println(words+" start playing 222222");
+          player2.play();
+          playerOrder=2;
+        }
+
+        //println("tweetNumber: "+tweetNumber+" / "+ (tweetArray.size()-1)+" ="+tweetText);
         finishSearch = true;
-        println("tweetNumber: "+tweetNumber+" / "+ (tweetArray.size()-1)+" ="+tweetText);
       } else {
         //println("not found!");
         finishSearch = true;
