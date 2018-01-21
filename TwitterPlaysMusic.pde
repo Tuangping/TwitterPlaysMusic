@@ -10,7 +10,7 @@ int playerOrder =0;
 
 Table table;
 String words;
-String emotion="a";
+String sentiment="nuetral";
 String inputFolder = "/Users/Tuang/Documents/Documents/UCLA_WORKS/DMA_5_Winter_2018/Sound_of_Twiiter/data/";
 File dataFolder = new File (inputFolder);
 Boolean finishSearch = false;
@@ -25,6 +25,7 @@ JSONObject tweetObj;
 String[] times;
 int tweetNumber=0;
 JSONArray tweetArray;
+String searchWord="#DonaldTrump";
 
 void setup() {
   size(600, 400);
@@ -37,17 +38,19 @@ void setup() {
   println(table.getRowCount() + "total rows in table");
   //uncomment below to see what data in each row/column 
   //for (TableRow row : table.rows()) {  
-  //    words = row.getString("words");
-  //    emotion = row.getString("emotion");
-  //    println(words);
-  //    println(emotion);
+  //  words = row.getString("word");
+  //  sentiment = row.getString("sentiment");
+  //  println(words);
+  //  println(sentiment);
   //}
   // minim library needs draw() to play music
   //tweet = "yelling";
   minim = new Minim(this); 
-  player = minim.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
+  player = minim.loadFile(dataFolder+"/music/"+sentiment+"/1.mp3");
   minim2 = new Minim(this); 
-  player2 = minim2.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
+  player2 = minim2.loadFile(dataFolder+"/music/"+sentiment+"/1.mp3");
+  //loadFile();
+  //compare();
 }
 
 void draw() {
@@ -79,37 +82,58 @@ void loadFile() {
 void compare() {
   if (!finishSearch) {
     for (TableRow row : table.rows()) {
-      words = row.getString("words");
-      println("comparing");
-      if (tweetText.contains(words)==true) {
-        if (playerOrder==0 &&player.isPlaying()) {
-          println("pause music");
-          player.pause();
+      words = row.getString("word");
+      //println("comparing");
+      tweetText = tweetText.replace(searchWord, "");
+      String[] list = split(tweetText, ' ');
+      for (int i=0; i<list.length; i++) {
+        if (list[i].equals(words)) {
+          println(list[i]);
+          println(words);
         }
-        if (playerOrder ==1 &&player.isPlaying()) {
-          println("pause music 2");
-          player2.pause();
-        }
-        println(words+" found!");
+      }
+      for (int i=0; i<list.length; i++) {
+        if (list[i].equals(words)) {
+          //if (playerOrder==0 &&player.isPlaying()) {
+          //  println("pause music");
+          //  player.pause();
+          //}
+          //if (playerOrder ==1 &&player.isPlaying()) {
+          //  println("pause music 2");
+          //  player2.pause();
+          //}
 
-        if (playerOrder ==0) {
-          emotion = row.getString("emotion");
-          player = minim.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
-          player.play();
-          println(words+" start playing 1111111");
-          playerOrder=1;
-        } else if ( playerOrder==1) {
-          emotion = row.getString("emotion");
-          player2 = minim2.loadFile(dataFolder+"/music/"+emotion+"/1.mp3");
-          println(words+" start playing 222222");
-          player2.play();
-          playerOrder=0;
+          if (playerOrder ==0) {
+            sentiment = row.getString("sentiment");
+            println(words+" found! 1");
+            if (sentiment.equals("")) {
+              player = minim.loadFile(dataFolder+"/music/nuetral/1.mp3");
+              player.loop();
+            } else {       
+              player = minim.loadFile(dataFolder+"/music/"+sentiment+"/1.mp3");
+              player.loop();
+            }
+            println("sentiment "+sentiment);
+            playerOrder=1;
+          } else if ( playerOrder==1) {
+            sentiment = row.getString("sentiment");
+            println(words+" found! 2 ");
+            if (sentiment.equals("")) {
+              player2 = minim.loadFile(dataFolder+"/music/nuetral/1.mp3");
+              player2.loop();
+            } else {
+              player2 = minim.loadFile(dataFolder+"/music/"+sentiment+"/1.mp3");
+              player2.loop();
+            }
+            println("sentiment "+sentiment);
+            playerOrder=0;
+          }
+          //println("tweetNumber: "+tweetNumber+" / "+ (tweetArray.size()-1)+" ="+tweetText);
+          finishSearch = true;
+        } else {
+          //println("not found!");
+          finishSearch = true;
         }
-        //println("tweetNumber: "+tweetNumber+" / "+ (tweetArray.size()-1)+" ="+tweetText);
-        finishSearch = true;
-      } else {
-        //println("not found!");
-        finishSearch = true;
       }
     }
   } else {
@@ -122,7 +146,7 @@ void runTweetsChoreo() {
   Tweets tweetsChoreo = new Tweets(session);
 
   // Set inputs
-  tweetsChoreo.setQuery("#PlaythisMusicforyourTwitter");
+  tweetsChoreo.setQuery(searchWord);
   tweetsChoreo.setAccessToken("904713273655779330-7Vc2TQXB53uNJSfYiYPUTemXqUDpUBp");
   tweetsChoreo.setConsumerKey("rsUEYjmYikIO47jcrfVZIVRiQ");
   tweetsChoreo.setConsumerSecret("mCgWVRk5fFwP2Dvx8oY52p3MTSCUVOhdgnACW63M9j20FdV5lu");
@@ -141,9 +165,9 @@ void getTweetFromJSON() {
   times = split(tweetTime, '+');
   //println(statuses.getJSONObject(0)); // Print tweet to console
   //println(tweetNumber+") "+tweetText+"|time :"+times[0]);
-  //for (int i=0; i<tweetArray.size(); i++) {
-  //println(i+" ) "+tweetArray.getJSONObject(i).getString("text"));
-  //}
+  for (int i=0; i<tweetArray.size(); i++) {
+    println(i+" ) "+tweetArray.getJSONObject(i).getString("text"));
+  }
 }
 
 void keyPressed() {
@@ -155,10 +179,14 @@ void keyPressed() {
     if (tweetNumber==tweetArray.size()-1) {
       tweetNumber=0;
       getTweetFromJSON();
+      player.pause();
+      player2.pause();
       finishSearch = false;
     } else {
       tweetNumber ++;
       getTweetFromJSON();
+      player.pause();
+      player2.pause();
       finishSearch = false;
     }
     break;
@@ -166,10 +194,14 @@ void keyPressed() {
     if (tweetNumber==0) {
       tweetNumber= tweetArray.size()-1;
       getTweetFromJSON();
+      player.pause();
+      player2.pause();
       finishSearch = false;
     } else {
       tweetNumber --;
       getTweetFromJSON();
+      player.pause();
+      player2.pause();
       finishSearch = false;
     }
     break;
