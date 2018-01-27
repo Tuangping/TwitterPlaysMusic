@@ -147,10 +147,10 @@ void runTweetsChoreo() {
 
   // Set inputs
   tweetsChoreo.setQuery(searchWord);
-  tweetsChoreo.setAccessToken("904713273655779330-7Vc2TQXB53uNJSfYiYPUTemXqUDpUBp");
-  tweetsChoreo.setConsumerKey("rsUEYjmYikIO47jcrfVZIVRiQ");
-  tweetsChoreo.setConsumerSecret("mCgWVRk5fFwP2Dvx8oY52p3MTSCUVOhdgnACW63M9j20FdV5lu");
-  tweetsChoreo.setAccessTokenSecret("Cx4IIERskBUVU0V67MTJSZrdbfLALWTkDWrpAUrPouQqC");
+  tweetsChoreo.setAccessToken("");
+  tweetsChoreo.setConsumerKey("");
+  tweetsChoreo.setConsumerSecret("");
+  tweetsChoreo.setAccessTokenSecret("");
 
   // Run the Choreo and store the results
   TweetsResultSet tweetsResults = tweetsChoreo.run();
